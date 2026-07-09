@@ -65,10 +65,9 @@ document.addEventListener("DOMContentLoaded", function () {
   let holdTimer;
 
   document.querySelectorAll("[data-copy]").forEach(function (el) {
-    el.style.cursor = "pointer";
     el.style.userSelect = "none";
 
-    function startHold(e) {
+    function startHold() {
       holdTimer = setTimeout(async function () {
         try {
           await navigator.clipboard.writeText(el.getAttribute("data-copy"));
