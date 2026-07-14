@@ -46,31 +46,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const group = new URLSearchParams(window.location.search).get("group");
+  const group = new URLSearchParams(window.location.search).get("group") || "our-products";
 
-  const sections = document.querySelectorAll(".container-4 [data-product-group]");
+  const allElements = document.querySelectorAll("[data-product-group]");
 
-  sections.forEach(function (section) {
-    if (!section.dataset.display) {
-      const display = getComputedStyle(section).display;
-      section.dataset.display = display === "none" ? "grid" : display;
+  // Запомняме оригиналния display и после скриваме всичко
+  allElements.forEach(function (el) {
+    if (!el.dataset.originalDisplay) {
+      const display = window.getComputedStyle(el).display;
+      el.dataset.originalDisplay = display === "none" ? "" : display;
     }
 
-    section.style.setProperty("display", "none", "important");
+    el.style.setProperty("display", "none", "important");
   });
 
-  const target = document.querySelector(
-    '.container-4 [data-product-group="' +
-      (group || "our-products") +
-      '"]'
+  // Показваме всички елементи със съответната група
+  const selected = document.querySelectorAll(
+    '[data-product-group="' + CSS.escape(group) + '"]'
   );
 
-  if (target) {
-    target.style.setProperty(
-      "display",
-      target.dataset.display,
-      "important"
-    );
+  if (selected.length > 0) {
+    selected.forEach(function (el) {
+      el.style.setProperty(
+        "display",
+        el.dataset.originalDisplay || "",
+        "important"
+      );
+    });
+  } else {
+    // Ако няма такава група, показваме Our Products
+    document
+      .querySelectorAll('[data-product-group="our-products"]')
+      .forEach(function (el) {
+        el.style.setProperty(
+          "display",
+          el.dataset.originalDisplay || "",
+          "important"
+        );
+      });
   }
 });
 </script>
