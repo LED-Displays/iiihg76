@@ -46,91 +46,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const requestedGroup =
-    new URLSearchParams(window.location.search).get("group") ||
-    "our-products";
+  const group = new URLSearchParams(window.location.search).get("group");
 
-  const allGroupElements =
-    document.querySelectorAll("[data-product-group]");
+  // ===== ПРОДУКТОВИ ГРУПИ (оставено както работи) =====
+  const sections = document.querySelectorAll(".container-4 [data-product-group]");
 
-  const originalDisplays = new Map();
-
-  function detectOriginalDisplay(element) {
-    const inlineValue = element.style.getPropertyValue("display");
-    const inlinePriority = element.style.getPropertyPriority("display");
-
-    // Ако елементът вече е видим, взимаме текущия му display.
-    let display = window.getComputedStyle(element).display;
-
-    if (display !== "none") {
-      return display;
+  sections.forEach(function (section) {
+    if (!section.dataset.display) {
+      const display = getComputedStyle(section).display;
+      section.dataset.display = display === "none" ? "grid" : display;
     }
 
-    // Временно премахваме inline display:none,
-    // за да разберем оригиналния изглед от Webflow CSS.
-    element.style.removeProperty("display");
-    display = window.getComputedStyle(element).display;
-
-    // Връщаме първоначалната inline стойност.
-    if (inlineValue) {
-      element.style.setProperty(
-        "display",
-        inlineValue,
-        inlinePriority
-      );
-    }
-
-    if (display !== "none") {
-      return display;
-    }
-
-    // Резервен вариант само ако Webflow пак връща none.
-    if (element.classList.contains("w-layout-grid")) {
-      return "grid";
-    }
-
-    return "block";
-  }
-
-  // Запомняме оригиналния display на всеки елемент.
-  allGroupElements.forEach(function (element) {
-    originalDisplays.set(
-      element,
-      detectOriginalDisplay(element)
-    );
+    section.style.setProperty("display", "none", "important");
   });
 
-  // Скриваме всички заглавия и продуктови контейнери.
-  allGroupElements.forEach(function (element) {
-    element.style.setProperty(
+  const target = document.querySelector(
+    '.container-4 [data-product-group="' +
+      (group || "our-products") +
+      '"]'
+  );
+
+  if (target) {
+    target.style.setProperty(
       "display",
-      "none",
+      target.dataset.display,
       "important"
     );
-  });
-
-  function showGroup(groupName) {
-    const matchingElements = document.querySelectorAll(
-      '[data-product-group="' +
-        CSS.escape(groupName) +
-        '"]'
-    );
-
-    matchingElements.forEach(function (element) {
-      element.style.setProperty(
-        "display",
-        originalDisplays.get(element),
-        "important"
-      );
-    });
-
-    return matchingElements.length > 0;
   }
 
-  // Показваме избраната група.
-  // При грешен параметър показваме Our Products.
-  if (!showGroup(requestedGroup)) {
-    showGroup("our-products");
+  // ===== ЗАГЛАВИЯ =====
+  const headings = document.querySelectorAll(".tabs-content h2[data-product-group]");
+
+  headings.forEach(function (heading) {
+    heading.style.setProperty("display", "none", "important");
+  });
+
+  const activeHeading = document.querySelector(
+    '.tabs-content h2[data-product-group="' +
+      (group || "our-products") +
+      '"]'
+  );
+
+  if (activeHeading) {
+    activeHeading.style.setProperty("display", "block", "important");
   }
 });
 </script>
